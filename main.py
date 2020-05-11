@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import csv
 import time
 import re
 
@@ -13,10 +14,11 @@ from bs4 import BeautifulSoup
 PATH = "C:\\Program Files (x86)\\chromedriver.exe"
 options = webdriver.ChromeOptions()
 options.add_experimental_option('w3c', False) #added so that TouchActions can be used to scroll, can be added to driver as an argument
-driver = webdriver.Chrome(PATH, options=options)
+
 
 def launch_login():
     global driver
+    driver = webdriver.Chrome(PATH, options=options)
     driver.get("https://app.instantscripts.com/login")
 
     global timer
@@ -65,33 +67,46 @@ topics = get_topics()
 
 for x, topic in enumerate(topics):
     if topic == 'Headlines':
-        first_topic.click()
-        #just for headlines, there are multiple categories so we have to close all those tabs before going on
-        for div_path in range(1,26):
-            head_area = timer.until(EC.presence_of_element_located((By.XPATH,f'//*[@id="app"]/div[1]/main/div/div/div/div[1]/div/div/div/div/div[{div_path}]')))
+        driver.quit()
+        continue
+    #     first_topic.click()
 
-            actions = ActionChains(driver)
-            actions.move_to_element(head_area)
-            if div_path < 15:
-                actions.click()
-            actions.perform()
-    else: 
-        launch_login()
-        source = driver.page_source
-        print(source)
-        topic = driver.find_element_by_xpath(((f'//*[@id="app"]/div[2]/nav/div[1]/div[2]/div/div[2]/a[{x+1}]')))
-        actions = ActionChains(driver)
-        actions.move_to_element(topic)
-        actions.click()
-        actions.perform()
+    #     #just for headlines, there are multiple categories so we have to close all those tabs before going on
+    #     for div_path in range(1,26):
+    #         head_area = timer.until(EC.presence_of_element_located((By.XPATH,f'//*[@id="app"]/div[1]/main/div/div/div/div[1]/div/div/div/div/div[{div_path}]')))
+
+    #         actions = ActionChains(driver)
+    #         actions.move_to_element(head_area)
+    #         if div_path < 15:
+    #             actions.click()
+    #         actions.perform()
+
+    # else: 
+    #     launch_login()
+    #     #print(source)
+    #     print(x)
+    #     print(topic)
+    #     timer1 = WebDriverWait(driver, 20)
+    #     time.sleep(8)
+    #     print('clicknow')
+    #     topic = timer1.until(EC.presence_of_element_located((By.XPATH,f'//*[@id="app"]/div[2]/nav/div[1]/div[2]/div/div[2]/a[{x+1}]')))
+    #     actions = ActionChains(driver)
+    #     actions.move_to_element(topic)
+    #     actions.click()
+    #     actions.perform()
+    #     time.sleep(3)
+    launch_login()
+    print('click')
+    time.sleep(10)
 
     i = 0 
     try: 
-        data = set()
+        fill_data = list()
+        ex_data = list()
         old_number = str()
         while i<30:
             source = driver.page_source
-
+            # print(source)
             main_soup = BeautifulSoup(source, 'lxml')
             scroll_table = main_soup.find('div', class_ = "match-height scrollable px-0 px-sm-6 pb-12")
 
@@ -112,24 +127,38 @@ for x, topic in enumerate(topics):
                         measure_soup = BeautifulSoup(str(m), 'lxml')
                         #print(measure_soup.prettify())
                         fill_in_copy = measure_soup.find('div',"v-list-item__title").text
-                        ex_copy = measure_soup.find('div',"v-list-item__subtitle")
-                        data.add(fill_in_copy)
+                        ex_copy = measure_soup.find('div',"v-list-item__subtitle").text
+                        print(fill_in_copy)
+                        print(ex_copy)
+                        fill_data.append(fill_in_copy)
+                        ex_data.append(ex_copy)
                 old_number = number_tag['style'][-len(number_tag['style']):-9]
                 i = 0
 
             taction = TouchActions(driver)
-            taction.scroll(0, 66)
+            taction.scroll(0, 200)
             taction.perform()
+            print(i)
             i += 1
             # end_card = timer.until(EC.presence_of_element_located((By.XPATH, f'//*[@id="app"]/div[1]/header/div/button[1]')))
             # actions = ActionChains(driver)
             # actions.move_to_element(end_card)
             # actions.click()
             # actions.perform()
-        driver.quit()
+        data = list(zip(fill_data, ex_data))
+        print(data)
+        with open(f'{topic}.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',')
+            print('hi')
+            writer.writerow(['Fill_in Copy', 'Example Copy'])
+            print('hello')
+            writer.writerows(data)
+            print('yes')
             
     except Exception as e:
         print(e)
+        driver.quit()
+    finally:
         driver.quit()
 
 driver.quit()
