@@ -97,6 +97,7 @@ for x, topic in enumerate(topics):
     #     time.sleep(3)
     launch_login()
     print('click')
+    print(topic)
     time.sleep(10)
 
     i = 0 
