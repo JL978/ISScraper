@@ -6,5 +6,5 @@ The main function of the project is to log into the website, navigate the mouse 
 
 The final script only work partially since the web page does not seem to allow for mouse click right after login - therefore the script was modified to promt the human user of which element to click. Another issue arise when scrolling the scroll area, the scroll area seem to scroll backwards every so often and make the scrolling stuck in a loop - the issue was overcomed with the help of a human user to pull the scroll bar down past the point where the scroll back happen. 
 
-
+![demo](demo.gif)
 
