@@ -41,8 +41,8 @@ def launch_login():
     pass_search = pass_re.search(pass_search.group())
     pass_id = pass_search.group()
 
-    driver.find_element_by_id(str(user_id)).send_keys('JimmyLam978@gmail.com') #Hidden for confidentiality
-    driver.find_element_by_id(str(pass_id)).send_keys('Pussy1234@') #Hidden for confidentiality
+    driver.find_element_by_id(str(user_id)).send_keys('REMOVED') #Hidden for confidentiality
+    driver.find_element_by_id(str(pass_id)).send_keys('REMOVED') #Hidden for confidentiality
     login.click()
 
 def get_topics():
